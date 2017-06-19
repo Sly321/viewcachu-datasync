@@ -1,0 +1,13 @@
+"language": "java"
+"jdk": "oraclejdk8"
+sudo: false
+cache:
+  directories:
+  - $HOME/.m2
+script:
+  - mvn clean test -U
+# later later
+#script:
+#  - mvn clean jacoco:prepare-agent test -U
+#after_success:
+#  - mvn jacoco:report coveralls:report
