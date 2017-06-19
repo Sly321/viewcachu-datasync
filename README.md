@@ -1,0 +1,2 @@
+[![Build Status](https://travis-ci.org/Sly321/viewcachu-datasync.svg?branch=master)](https://travis-ci.org/Sly321/viewcachu-datasync)
+[![Dependencies](https://www.versioneye.com/user/projects/59480196368b08004b9a429c/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/59480196368b08004b9a429c?child=summary)
