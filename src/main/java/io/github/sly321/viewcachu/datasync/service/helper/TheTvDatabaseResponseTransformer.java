@@ -3,6 +3,9 @@ package io.github.sly321.viewcachu.datasync.service.helper;
 import io.github.sly321.viewcachu.datasync.model.Series;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -29,12 +32,56 @@ public class TheTvDatabaseResponseTransformer {
      * @return
      */
     public static List<Series> transformResponseToSeriesList(final String response) {
-        final Document xml = parseResponseToXml(response);
-        System.out.println(xml);
-
         final List<Series> seriesList = new ArrayList<Series>();
 
+        final Document xml = parseResponseToXml(response);
+        final Element dataRoot = xml.getDocumentElement();
+
+        if (dataRoot.getNodeName() != "Data") {
+            return seriesList;
+        }
+
+        final NodeList childNodes = dataRoot.getChildNodes();
+
+        for (int count = 0; count < childNodes.getLength(); count++) {
+            final Node seriesNode = childNodes.item(count);
+
+            if ((seriesNode.getNodeName().equals("Series")) && isDeLanguageNode(seriesNode)) {
+                seriesList.add(transformNodeToSeries(seriesNode));
+            }
+        }
+
         return seriesList;
+    }
+
+    private static boolean isDeLanguageNode(final Node seriesNode) {
+        final NodeList children = seriesNode.getChildNodes();
+
+        for (int count = 0; count < children.getLength(); count++) {
+            final Node node = children.item(count);
+
+            if ("language".equals(node.getNodeName())) {
+                return "de".equals(node.getTextContent());
+            }
+        }
+
+        return false;
+    }
+
+    private static Series transformNodeToSeries(final Node seriesNode) {
+        final NodeList children = seriesNode.getChildNodes();
+        final Series series = new Series();
+
+        for (int count = 0; count < children.getLength(); count++) {
+            final Node node = children.item(count);
+
+            if ("seriesid".equals(node.getNodeName())) {
+                // series.
+                // seriesid, SeriesName, banner, Overview, FirstAired, Network, IMBD_ID, id
+            }
+        }
+
+        return series;
     }
 
     public static Document parseResponseToXml(final String response) {
