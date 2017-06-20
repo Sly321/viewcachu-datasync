@@ -1,9 +1,14 @@
 package io.github.sly321.viewcachu.datasync.service.impl;
 
+import io.github.sly321.viewcachu.datasync.model.Series;
 import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
+
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 
 public class TheTvDatabaseApiWrapperImplTest {
@@ -15,15 +20,31 @@ public class TheTvDatabaseApiWrapperImplTest {
     }
 
     @Test
-    public void testFindSeriesByName_Vorbedingung_ErwartetesVerhalten() throws Exception {
+    public void testFindSeriesByName_TheWalkingDeadWirdAlsNameUebergeben_SollteMindestensZweiSerienFinden()
+        throws Exception {
         // Vorbereitung
 
         final String name = "The Walking Dead";
 
         // Ausführung
-        classUnderTest.findSerieByName(name);
+        final List<Series> seriesList = classUnderTest.findSerieByName(name);
 
         // Prüfung
-        // fail("not implemented yet"); // TODO implement me
+        // @Mariano Hamcrest will nicht.
+        // assertThat(seriesList.size(), is(greaterThan(1)));
+        assertTrue(seriesList.size() >= 2); // The Walking Dead und Fear The Walking Dead.
+    }
+
+    @Test
+    public void testFindSeriesByName_FearTheWalkingDead_SollteEineSerieFinden() throws Exception {
+        // Vorbereitung
+
+        final String name = "Fear The Walking Dead";
+
+        // Ausführung
+        final List<Series> seriesList = classUnderTest.findSerieByName(name);
+
+        // Prüfung
+        assertTrue(seriesList.size() == 1);
     }
 }

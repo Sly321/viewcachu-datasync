@@ -5,6 +5,11 @@ import lombok.Data;
 import java.util.Date;
 
 
+/**
+ * Model für ein Serien Objekt.
+ *
+ * @author Sven Liebig
+ */
 @Data
 public class Series {
     private int id;

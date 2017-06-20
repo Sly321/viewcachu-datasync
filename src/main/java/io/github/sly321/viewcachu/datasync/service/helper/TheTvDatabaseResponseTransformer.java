@@ -1,6 +1,7 @@
 package io.github.sly321.viewcachu.datasync.service.helper;
 
 import io.github.sly321.viewcachu.datasync.model.Series;
+import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,10 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.StringReader;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +27,23 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
+ * Helper Klasse um die Response des {@link TheTvDatabaseApiWrapper} in eine
+ * Datenstruktur ({@link Series}) zu bekommen.
+ *
  * @author Sven Liebig
- * @since  20.06.2017
  */
 public class TheTvDatabaseResponseTransformer {
+    private static final String XML_NODE_NETWORK = "Network";
+    private static final String XML_NODE_IMBDID = "IMBD_ID";
+    private static final String XML_NODE_BANNER = "banner";
+    private static final String XML_NODE_DESCRIPTION = "Overview";
+    private static final String XML_NODE_AIRED = "FirstAired";
+    private static final String XML_NODE_NAME = "SeriesName";
+    private static final String XML_NODE_ID = "seriesid";
+
+    private TheTvDatabaseResponseTransformer() {
+    }
+
     /**
      * @param  response
      *
@@ -47,7 +65,12 @@ public class TheTvDatabaseResponseTransformer {
             final Node seriesNode = childNodes.item(count);
 
             if ((seriesNode.getNodeName().equals("Series")) && isDeLanguageNode(seriesNode)) {
-                seriesList.add(transformNodeToSeries(seriesNode));
+                try {
+                    seriesList.add(transformNodeToSeries(seriesNode));
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -66,22 +89,6 @@ public class TheTvDatabaseResponseTransformer {
         }
 
         return false;
-    }
-
-    private static Series transformNodeToSeries(final Node seriesNode) {
-        final NodeList children = seriesNode.getChildNodes();
-        final Series series = new Series();
-
-        for (int count = 0; count < children.getLength(); count++) {
-            final Node node = children.item(count);
-
-            if ("seriesid".equals(node.getNodeName())) {
-                // series.
-                // seriesid, SeriesName, banner, Overview, FirstAired, Network, IMBD_ID, id
-            }
-        }
-
-        return series;
     }
 
     public static Document parseResponseToXml(final String response) {
@@ -106,5 +113,48 @@ public class TheTvDatabaseResponseTransformer {
         }
 
         return null;
+    }
+
+    /**
+     * Transformiert eine XML {@link Node} einer Serie zu einem {@link Series}
+     * Objekt.
+     *
+     * @param  seriesNode Die Xml {@link Node} der Serie.
+     *
+     * @return Ein Serienobjekt mit Id, Namen, Beschreibung, Ausstrahlungsdatum,
+     *         Netzwerk zugehörigkeit, Imbd Id und Banner Url.
+     *
+     * @throws ParseException Falls beim Parsen des Erstausstrahlungsdatums ein
+     *                        Fehler auftritt wird diese Exception geschmissen.
+     */
+    private static Series transformNodeToSeries(final Node seriesNode) throws ParseException {
+        final NodeList children = seriesNode.getChildNodes();
+        final Series series = new Series();
+
+        for (int count = 0; count < children.getLength(); count++) {
+            final Node node = children.item(count);
+
+            final String content = node.getTextContent();
+            final String nodeName = node.getNodeName();
+
+            if (XML_NODE_ID.equals(nodeName)) {
+                series.setId(Integer.valueOf(content));
+            } else if (XML_NODE_NAME.equals(nodeName)) {
+                series.setName(content);
+            } else if (XML_NODE_DESCRIPTION.equals(nodeName)) {
+                series.setDescription(content);
+            } else if (XML_NODE_AIRED.equals(nodeName)) {
+                final DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                series.setAiringDate(format.parse(content));
+            } else if (XML_NODE_NETWORK.equals(nodeName)) {
+                series.setNetwork(content);
+            } else if (XML_NODE_IMBDID.equals(nodeName)) {
+                series.setImbdId(Integer.valueOf(content));
+            } else if (XML_NODE_BANNER.equals(nodeName)) {
+                series.setImage(content);
+            }
+        }
+
+        return series;
     }
 }
