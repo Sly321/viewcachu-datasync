@@ -1,70 +1,89 @@
 package io.github.sly321.viewcachu.datasync.service.impl;
 
+import io.github.sly321.viewcachu.datasync.model.Series;
+import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
+import io.github.sly321.viewcachu.datasync.service.helper.TheTvDatabaseResponseTransformer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
+import java.util.List;
+
+import javax.xml.ws.http.HTTPException;
+
 
 public class TheTvDatabaseApiWrapperImpl implements TheTvDatabaseApiWrapper {
+    private String API_KEY = "FDDE19A386F91E9D";
 
-	private String API_KEY = "ADD API KEY HERE <3";
+    @Override
+    public void getSerieById(final int id) {
+        final String urlString = API_URL + API_KEY + "/series/" + id + "/" + LANG_KEY;
+        requestUrl(urlString);
+    }
 
-	@Override
-	public void getSerieById(int id) {
-		String urlString = API_URL + API_KEY + "/series/" + id + "/" + LANG_KEY;
-		requestUrl(urlString);
-	}
+    @Override
+    public List<Series> findSerieByName(final String name) {
+        String urlString = "";
 
-	@Override
-	public void findSerieByName(String name) {
-		String urlString = "";
-		try {
-			urlString = API_URL + BY_NAME + URLEncoder.encode(name, "UTF-8") + LANG_PARAM;
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+        try {
+            urlString = API_URL + BY_NAME + URLEncoder.encode(name, "UTF-8") + LANG_PARAM;
+        } catch (UnsupportedEncodingException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
-		requestUrl(urlString);
-	}
+        final String response = requestUrl(urlString);
+        final List<Series> series = TheTvDatabaseResponseTransformer.transformResponseToSeriesList(
+                response);
 
-	private void requestUrl(String urlString) {
-		try {
+        return series;
+    }
 
-			URL url = new URL(urlString);
-			System.out.println("URL: " + url);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/json");
+    private String requestUrl(final String urlString) {
+        String output = null;
 
-			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-			}
+        try {
+            final URL url = new URL(urlString);
+            final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
 
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            final int responseCode = conn.getResponseCode();
+            checkConnection(responseCode);
 
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
+            final BufferedReader br =
+                new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
-			conn.disconnect();
+            output = "";
 
-		} catch (MalformedURLException e) {
+            String line;
 
-			e.printStackTrace();
+            while ((line = br.readLine()) != null) {
+                output += line;
+            }
 
-		} catch (IOException e) {
+            conn.disconnect();
+        } catch (HTTPException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-			e.printStackTrace();
+        return output;
+    }
 
-		}
-	}
+    private void checkConnection(final int responseCode) throws HTTPException {
+        if (responseCode != 200) {
+            throw new HTTPException(responseCode);
+        }
+    }
 }
