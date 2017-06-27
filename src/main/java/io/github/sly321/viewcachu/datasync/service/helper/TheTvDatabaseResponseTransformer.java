@@ -1,7 +1,7 @@
 package io.github.sly321.viewcachu.datasync.service.helper;
 
 import io.github.sly321.viewcachu.datasync.model.Series;
-import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
+import io.github.sly321.viewcachu.datasync.service.ApiWrapper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
- * Helper Klasse um die Response des {@link TheTvDatabaseApiWrapper} in eine
+ * Helper Klasse um die Response des {@link ApiWrapper} in eine
  * Datenstruktur ({@link Series}) zu bekommen.
  *
  * @author Sven Liebig

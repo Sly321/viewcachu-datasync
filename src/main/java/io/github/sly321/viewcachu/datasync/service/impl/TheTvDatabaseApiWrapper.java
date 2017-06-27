@@ -1,26 +1,40 @@
 package io.github.sly321.viewcachu.datasync.service.impl;
 
-import io.github.sly321.viewcachu.datasync.model.Series;
-import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
-import io.github.sly321.viewcachu.datasync.service.helper.TheTvDatabaseResponseTransformer;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-
 import java.util.List;
 
 import javax.xml.ws.http.HTTPException;
 
+import io.github.sly321.viewcachu.datasync.model.Series;
+import io.github.sly321.viewcachu.datasync.service.ApiWrapper;
+import io.github.sly321.viewcachu.datasync.service.helper.TheTvDatabaseResponseTransformer;
 
-public class TheTvDatabaseApiWrapperImpl implements TheTvDatabaseApiWrapper {
+
+public class TheTvDatabaseApiWrapper implements ApiWrapper {
     private String API_KEY = "FDDE19A386F91E9D";
+    
+
+    /** Url der API. */
+    final private String API_URL = "http://thetvdb.com/api/";
+
+    /** Base Url der Grafiken. */
+    final private String BANNER_URL = "http://thetvdb.com/banners/_cache/";
+
+    /** Key um Serien anhand des Namens zu suchen. */
+    final private String BY_NAME = "GetSeries.php?seriesname=";
+
+    /** Setzt die Ausgabesprache der API, default: Deutsch */
+    final private String LANG_KEY = "de.xml";
+
+    /** Setzt die Ausgabesprache der API als Parameter, default: Deutsch */
+    final private String LANG_PARAM = "&language=de";
 
     @Override
     public void getSerieById(final int id) {

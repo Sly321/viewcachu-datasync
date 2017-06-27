@@ -1,7 +1,7 @@
 package io.github.sly321.viewcachu.datasync.service.impl;
 
 import io.github.sly321.viewcachu.datasync.model.Series;
-import io.github.sly321.viewcachu.datasync.service.TheTvDatabaseApiWrapper;
+import io.github.sly321.viewcachu.datasync.service.ApiWrapper;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,12 +11,12 @@ import org.junit.Test;
 import java.util.List;
 
 
-public class TheTvDatabaseApiWrapperImplTest {
-    private TheTvDatabaseApiWrapper classUnderTest;
+public class TheTvDatabaseApiWrapperTest {
+    private ApiWrapper classUnderTest;
 
     @Before
     public void setUp() {
-        classUnderTest = new TheTvDatabaseApiWrapperImpl();
+        classUnderTest = new TheTvDatabaseApiWrapper();
     }
 
     @Test
