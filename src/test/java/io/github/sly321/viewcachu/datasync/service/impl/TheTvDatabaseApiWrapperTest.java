@@ -3,8 +3,8 @@ package io.github.sly321.viewcachu.datasync.service.impl;
 import io.github.sly321.viewcachu.datasync.model.Series;
 import io.github.sly321.viewcachu.datasync.service.ApiWrapper;
 
-import static org.junit.Assert.assertTrue;
-
+import org.hamcrest.junit.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,28 +23,24 @@ public class TheTvDatabaseApiWrapperTest {
     public void testFindSeriesByName_TheWalkingDeadWirdAlsNameUebergeben_SollteMindestensZweiSerienFinden()
         throws Exception {
         // Vorbereitung
-
         final String name = "The Walking Dead";
 
         // Ausführung
         final List<Series> seriesList = classUnderTest.findSerieByName(name);
 
         // Prüfung
-        // @Mariano Hamcrest will nicht.
-        // assertThat(seriesList.size(), is(greaterThan(1)));
-        assertTrue(seriesList.size() >= 2); // The Walking Dead und Fear The Walking Dead.
+        MatcherAssert.assertThat(seriesList.size(), Matchers.is(Matchers.greaterThan(1)));
     }
 
     @Test
     public void testFindSeriesByName_FearTheWalkingDead_SollteEineSerieFinden() throws Exception {
         // Vorbereitung
-
         final String name = "Fear The Walking Dead";
 
         // Ausführung
         final List<Series> seriesList = classUnderTest.findSerieByName(name);
 
         // Prüfung
-        assertTrue(seriesList.size() == 1);
+        MatcherAssert.assertThat(seriesList.size(), Matchers.is(1));
     }
 }
